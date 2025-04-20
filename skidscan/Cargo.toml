@@ -2,7 +2,7 @@
 name = "skidscan"
 version = "2.0.1"
 authors = ["William Venner <william@venner.io>"]
-edition = "2018"
+edition = "2024"
 license = "MIT"
 description = "Quick & dirty Rust sigscanning crate"
 repository = "https://github.com/WilliamVenner/skidscan"

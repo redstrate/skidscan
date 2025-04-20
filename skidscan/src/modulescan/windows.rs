@@ -1,22 +1,21 @@
 use crate::ModuleSigScanError;
 
 use std::mem;
-use std::ptr;
 
-use winapi::shared::minwindef;
-use winapi::um::libloaderapi;
-use winapi::um::processthreadsapi;
-use winapi::um::psapi;
+use windows::{
+    Win32::Foundation::*, Win32::System::LibraryLoader::*, Win32::System::ProcessStatus::*,
+    Win32::System::Threading::*, core::PCWSTR,
+};
 
 pub struct Scanner {
-    _module: minwindef::HMODULE,
+    _module: HMODULE,
     data_begin: *mut u8,
     data_end: *mut u8,
 }
 
 impl Scanner {
     pub fn for_module(name: &str) -> Option<Scanner> {
-        let mut module: minwindef::HMODULE = ptr::null_mut();
+        let mut module: HMODULE = HMODULE::default();
         let data_begin: *mut u8;
         let data_end: *mut u8;
 
@@ -24,19 +23,20 @@ impl Scanner {
         let name_winapi: Vec<u16> = name.encode_utf16().chain(std::iter::once(0)).collect();
 
         unsafe {
-            if libloaderapi::GetModuleHandleExW(0, name_winapi.as_ptr(), &mut module) == 0 {
+            if GetModuleHandleExW(0, PCWSTR(name_winapi.as_ptr()), &mut module).is_err() {
                 return None;
             }
 
-            let mut module_info_wrapper = mem::MaybeUninit::<psapi::MODULEINFO>::zeroed();
-            if psapi::GetModuleInformation(
-                processthreadsapi::GetCurrentProcess(),
+            let mut module_info_wrapper = mem::MaybeUninit::<MODULEINFO>::zeroed();
+            if GetModuleInformation(
+                GetCurrentProcess(),
                 module,
                 module_info_wrapper.as_mut_ptr(),
-                mem::size_of::<psapi::MODULEINFO>() as u32,
-            ) == 0
+                mem::size_of::<MODULEINFO>() as u32,
+            )
+            .is_err()
             {
-                libloaderapi::FreeLibrary(module);
+                FreeLibrary(module);
                 return None;
             }
 

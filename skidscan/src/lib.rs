@@ -19,29 +19,29 @@ pub trait SigscanPtr: Copy + Ord {
 impl SigscanPtr for *const u8 {
     #[inline(always)]
     unsafe fn next(self) -> Self {
-        self.add(1)
+        unsafe { self.add(1) }
     }
     #[inline(always)]
     unsafe fn byte(self) -> u8 {
-        *self
+        unsafe { *self }
     }
     #[inline(always)]
     unsafe fn rewind(self, bytes: usize) -> Self {
-        self.sub(bytes)
+        unsafe { self.sub(bytes) }
     }
 }
 impl SigscanPtr for *mut u8 {
     #[inline(always)]
     unsafe fn next(self) -> Self {
-        self.add(1)
+        unsafe { self.add(1) }
     }
     #[inline(always)]
     unsafe fn byte(self) -> u8 {
-        *self
+        unsafe { *self }
     }
     #[inline(always)]
     unsafe fn rewind(self, bytes: usize) -> Self {
-        self.sub(bytes)
+        unsafe { self.sub(bytes) }
     }
 }
 
